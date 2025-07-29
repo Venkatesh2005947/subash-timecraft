@@ -1,7 +1,11 @@
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { cn } from "@/lib/utils";
 import classicWatch from "@/assets/classic-watch.jpg";
 import sportsWatch from "@/assets/sports-watch.jpg";
 import luxuryWatch from "@/assets/luxury-watch.jpg";
@@ -51,6 +55,30 @@ const featuredProducts = [
 ];
 
 const FeaturedProducts = () => {
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+  const handleWishlistToggle = (product: any) => {
+    if (isInWishlist(product.id.toString())) {
+      removeFromWishlist(product.id.toString());
+    } else {
+      addToWishlist({
+        id: product.id.toString(),
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+    }
+  };
+
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id.toString(),
+      name: product.name,
+      image: product.image,
+      price: product.price,
+    });
+  };
   return (
     <section className="py-20 bg-gradient-subtle">
       <div className="container mx-auto px-4">
@@ -94,13 +122,21 @@ const FeaturedProducts = () => {
                       <Button 
                         size="icon" 
                         variant="secondary"
-                        className="rounded-full shadow-lg hover:scale-110 transition-transform"
+                        className={cn(
+                          "rounded-full shadow-lg hover:scale-110 transition-transform",
+                          isInWishlist(product.id.toString()) && "bg-gold text-gold-foreground"
+                        )}
+                        onClick={() => handleWishlistToggle(product)}
                       >
-                        <Heart className="h-4 w-4" />
+                        <Heart className={cn(
+                          "h-4 w-4",
+                          isInWishlist(product.id.toString()) && "fill-current"
+                        )} />
                       </Button>
                       <Button 
                         size="icon"
                         className="rounded-full shadow-lg bg-gold hover:bg-gold/90 text-gold-foreground hover:scale-110 transition-transform"
+                        onClick={() => handleAddToCart(product)}
                       >
                         <ShoppingCart className="h-4 w-4" />
                       </Button>

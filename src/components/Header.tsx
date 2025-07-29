@@ -8,11 +8,28 @@ import {
   User, 
   Search, 
   Menu, 
-  Clock 
+  Clock,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const { cartCount } = useCart();
+  const { wishlistItems } = useWishlist();
+  const navigate = useNavigate();
+
+  const handleAuthAction = () => {
+    if (user) {
+      signOut();
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -38,24 +55,33 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <User className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden md:flex"
+              onClick={handleAuthAction}
+            >
+              {user ? <LogOut className="h-5 w-5" /> : <User className="h-5 w-5" />}
             </Button>
             <Button variant="ghost" size="icon" className="relative">
               <Heart className="h-5 w-5" />
-              <Badge 
-                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-gold text-gold-foreground"
-              >
-                3
-              </Badge>
+              {wishlistItems.length > 0 && (
+                <Badge 
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-gold text-gold-foreground"
+                >
+                  {wishlistItems.length}
+                </Badge>
+              )}
             </Button>
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
-              <Badge 
-                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-gold text-gold-foreground"
-              >
-                2
-              </Badge>
+              {cartCount > 0 && (
+                <Badge 
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-gold text-gold-foreground"
+                >
+                  {cartCount}
+                </Badge>
+              )}
             </Button>
             <Button
               variant="ghost"
